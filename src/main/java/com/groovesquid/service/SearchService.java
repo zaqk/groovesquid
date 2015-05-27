@@ -64,9 +64,9 @@ public class SearchService extends HttpService {
                     }
                 }
 
-                album = new Album(release.get("id").asString(), release.get("title").asString(), artists, date);
+                album = new Album(release.get("id").asString(), release.get("title").asString(), artists, date, null);
             } else {
-                album = new Album("", "", artists, null);
+                album = new Album("", "", artists, null, null);
             }
 
             Iterator<Song> i = songs.iterator();
@@ -152,14 +152,15 @@ public class SearchService extends HttpService {
                     e.printStackTrace();
                 }
             }
-            albums.add(new Album(release.asObject().get("id").asString(), release.asObject().get("title").asString(), artists, date));
+            
+            albums.add(new Album(release.asObject().get("id").asString(), release.asObject().get("title").asString(), artists, date, Integer.toString(release.asObject().get("medium-list").asObject().get("track-count").asInt())));
         }
 
         return albums;
     }
 
     public List<Artist> getArtistsByQuery(String query) {
-        List<Artist> artists = new ArrayList<Artist>();
+        List<Artist> artistsList = new ArrayList<Artist>();
 
         String response = null;
         try {
@@ -167,8 +168,18 @@ public class SearchService extends HttpService {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        
+        JsonValue artists = JsonObject.readFrom(response).get("artist-list").asObject().get("artist");
+        
+        if (artists == null || artists.asArray().isEmpty()) {
+            return artistsList;
+        }
+        
+        for (JsonValue artist : artists.asArray()) {
+                artistsList.add(new Artist(artist.asObject().get("id").asString(), artist.asObject().asObject().get("name").asString()));
+        }
 
-        return artists;
+        return artistsList;
     }
 
     public List<Song> getTopItunesSongs(String country) {
@@ -198,7 +209,7 @@ public class SearchService extends HttpService {
                         }
                     }
                 }
-                Album album = new Album(null, entry.asObject().get("im:collection").asObject().get("im:name").asObject().get("label").asString(), artists, null);
+                Album album = new Album(null, entry.asObject().get("im:collection").asObject().get("im:name").asObject().get("label").asString(), artists, null, null);
                 songs.add(new Song(null, title, artists, album, 0));
             }
         }
@@ -232,7 +243,7 @@ public class SearchService extends HttpService {
                 for (JsonValue artist : track.asObject().get("artists").asArray()) {
                     artists.add(new Artist(null, artist.asObject().get("name").asString()));
                 }
-                Album album = new Album(null, track.asObject().get("label").asObject().get("name").asString(), artists, null);
+                Album album = new Album(null, track.asObject().get("label").asObject().get("name").asString(), artists, null, null);
                 songs.add(new Song(null, track.asObject().get("title").asString(), artists, album, track.asObject().get("duration").asObject().get("milliseconds").asLong()));
             }
         }
@@ -254,6 +265,15 @@ public class SearchService extends HttpService {
     }
 
     public List<Song> getSongsByArtist(Artist target) {
+        /*
+    	String response = null;
+        try {
+            response = get("http://search.musicbrainz.org/ws/2/recording/?query=" + URLEncoder.encode("arid:" + target.getId(), "UTF-8") + "&fmt=json&limit=100");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        */
         return null;
+    	
     }
 }

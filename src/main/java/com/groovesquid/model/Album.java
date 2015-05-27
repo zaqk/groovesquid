@@ -9,12 +9,14 @@ public class Album {
     private List<Artist> artists;
     private String imageUrl;
     private Calendar releaseDate;
+    private String trackCount;
 
-    public Album(String id, String name, List<Artist> artists, Calendar releaseDate) {
+    public Album(String id, String name, List<Artist> artists, Calendar releaseDate, String trackCount) {
         this.id = id;
         this.name = name;
         this.artists = artists;
         this.releaseDate = releaseDate;
+        this.trackCount = trackCount;
     }
 
     public String getArtistNames() {
@@ -58,6 +60,10 @@ public class Album {
 
     public String getReleaseYear() {
         return releaseDate != null ? String.valueOf(releaseDate.get(Calendar.YEAR)) : "";
+    }
+    
+    public String getTrackCount() {
+        return trackCount;
     }
 
     public boolean equals(Object obj) {

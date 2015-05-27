@@ -44,7 +44,8 @@ public class AlbumSearchTableModel extends AbstractTableModel {
             case 1:
                 return album.getArtists() != null ? album.getArtistNames() : "";
             case 2:
-            	return null;
+            	return album.getTrackCount() != "0" ? album.getTrackCount() : "";
+            	
             case 3:
                 return album.getReleaseYear();
         }
